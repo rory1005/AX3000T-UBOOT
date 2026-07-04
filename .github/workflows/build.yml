@@ -1,0 +1,29 @@
+name: Build AX3000T U-Boot
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git build-essential gcc-aarch64-linux-gnu flex bison libssl-dev \
+            device-tree-compiler qemu-user-static python3 bc
+
+      - name: Build
+        run: bash scripts/build.sh
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ax3000t-uboot-512m
+          path: out/*
