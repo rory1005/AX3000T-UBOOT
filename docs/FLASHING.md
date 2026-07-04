@@ -31,10 +31,10 @@
 ## 默认 512MB 分区
 
 ```text
-nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),496m(ubi),256k(KF)
+nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),472m(ubi),256k(KF)
 ```
 
-这个布局在 `KF` 后面保留未分区空间，延续原 128MB 布局的风格，也给芯片末尾的 NMBM 预留空间。
+512MB NAND 启用 NMBM 后，U-Boot 看到的可用 `nmbm0` 空间约为 480MiB。`472m(ubi)` 给前面的启动分区和末尾 `KF` 留出空间，避免分区越界。
 
 ## 提醒
 
