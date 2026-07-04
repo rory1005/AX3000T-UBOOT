@@ -11,6 +11,7 @@
 - 默认大分区：`496m(ubi)`
 - Flash：补齐 `W25N04KV` 的 ATF/BL2 识别，保留上游已有 `GD5F4GQ4xAYIG` 支持
 - 交换芯片：AN8855
+- 保留旧版 AX3000T U-Boot 的 `compatible` 顺序，方便从现有 U-Boot 网页升级
 
 ## 本地构建
 
