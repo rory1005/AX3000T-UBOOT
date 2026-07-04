@@ -8,7 +8,7 @@
 - 默认构建 `uboot-mtk-20250711` + `atf-20250711`
 - 新增板型：`mt7981_ax3000t_an8855_512m`
 - RAM：512MB
-- 默认大分区：`496m(ubi)`
+- 默认大分区：`472m(ubi)`，适配 512MB NAND 启用 NMBM 后约 480MiB 的可用空间
 - Flash：补齐 `W25N04KV` 的 ATF/BL2 识别，保留上游已有 `GD5F4GQ4xAYIG` 支持
 - 交换芯片：AN8855
 - 保留旧版 AX3000T U-Boot 的 `compatible` 顺序，方便从现有 U-Boot 网页升级
@@ -43,7 +43,7 @@ bash scripts/build.sh
 默认 `mtd_layout_label=default`：
 
 ```text
-nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),496m(ubi),256k(KF)
+nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),472m(ubi),256k(KF)
 ```
 
 同时保留这些可选布局：
