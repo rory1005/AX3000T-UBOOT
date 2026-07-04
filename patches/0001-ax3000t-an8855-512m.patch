@@ -1,0 +1,486 @@
+diff --git a/atf-20240117-bacca82a8/configs/mt7981_ax3000t_an8855_512m_defconfig b/atf-20240117-bacca82a8/configs/mt7981_ax3000t_an8855_512m_defconfig
+new file mode 100644
+index 000000000..846d66cd6
+--- /dev/null
++++ b/atf-20240117-bacca82a8/configs/mt7981_ax3000t_an8855_512m_defconfig
+@@ -0,0 +1,4 @@
++_PLAT_MT7981=y
++_MT7981_BOARD_BGA=y
++_DRAM_SIZE_512MB=y
++_LOG_LEVEL_INFO=y
+diff --git a/atf-20240117-bacca82a8/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c b/atf-20240117-bacca82a8/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c
+index 4ff036e4c..8e58d7972 100644
+--- a/atf-20240117-bacca82a8/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c
++++ b/atf-20240117-bacca82a8/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c
+@@ -26,6 +26,7 @@ static int mtk_snand_micron_select_die(struct mtk_snand *snf, uint32_t dieidx);
+ #define SNAND_MEMORG_2G_2K_64_2D	SNAND_MEMORG(2048, 64, 64, 1024, 1, 2)
+ #define SNAND_MEMORG_2G_2K_128_2P	SNAND_MEMORG(2048, 128, 64, 2048, 2, 1)
+ #define SNAND_MEMORG_4G_2K_64_2P	SNAND_MEMORG(2048, 64, 64, 4096, 2, 1)
++#define SNAND_MEMORG_4G_2K_128_2P	SNAND_MEMORG(2048, 128, 64, 4096, 2, 1)
+ #define SNAND_MEMORG_4G_2K_128_2P_2D	SNAND_MEMORG(2048, 128, 64, 2048, 2, 2)
+ #define SNAND_MEMORG_8G_4K_256_2D	SNAND_MEMORG(4096, 256, 64, 2048, 1, 2)
+ 
+@@ -101,6 +102,12 @@ static const struct snand_flash_info snand_flash_ids[] = {
+ 		   &snand_cap_program_load_x4,
+ 		   NULL,
+ 		   SNAND_DRV_12mA),
++	SNAND_INFO("W25N04KV", SNAND_ID(SNAND_ID_DYMMY, 0xef, 0xaa, 0x23),
++		   SNAND_MEMORG_4G_2K_128_2P,
++		   &snand_cap_read_from_cache_quad,
++		   &snand_cap_program_load_x4,
++		   NULL,
++		   SNAND_DRV_12mA),
+ 
+ 	SNAND_INFO("GD5F1GQ4UAWxx", SNAND_ID(SNAND_ID_ADDR, 0xc8, 0x10),
+ 		   SNAND_MEMORG_1G_2K_64,
+diff --git a/atf-20250711/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c b/atf-20250711/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c
+index 4ff036e4c..8e58d7972 100644
+--- a/atf-20250711/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c
++++ b/atf-20250711/plat/mediatek/apsoc_common/drivers/snfi/mtk-snand-ids.c
+@@ -26,6 +26,7 @@ static int mtk_snand_micron_select_die(struct mtk_snand *snf, uint32_t dieidx);
+ #define SNAND_MEMORG_2G_2K_64_2D	SNAND_MEMORG(2048, 64, 64, 1024, 1, 2)
+ #define SNAND_MEMORG_2G_2K_128_2P	SNAND_MEMORG(2048, 128, 64, 2048, 2, 1)
+ #define SNAND_MEMORG_4G_2K_64_2P	SNAND_MEMORG(2048, 64, 64, 4096, 2, 1)
++#define SNAND_MEMORG_4G_2K_128_2P	SNAND_MEMORG(2048, 128, 64, 4096, 2, 1)
+ #define SNAND_MEMORG_4G_2K_128_2P_2D	SNAND_MEMORG(2048, 128, 64, 2048, 2, 2)
+ #define SNAND_MEMORG_8G_4K_256_2D	SNAND_MEMORG(4096, 256, 64, 2048, 1, 2)
+ 
+@@ -101,6 +102,12 @@ static const struct snand_flash_info snand_flash_ids[] = {
+ 		   &snand_cap_program_load_x4,
+ 		   NULL,
+ 		   SNAND_DRV_12mA),
++	SNAND_INFO("W25N04KV", SNAND_ID(SNAND_ID_DYMMY, 0xef, 0xaa, 0x23),
++		   SNAND_MEMORG_4G_2K_128_2P,
++		   &snand_cap_read_from_cache_quad,
++		   &snand_cap_program_load_x4,
++		   NULL,
++		   SNAND_DRV_12mA),
+ 
+ 	SNAND_INFO("GD5F1GQ4UAWxx", SNAND_ID(SNAND_ID_ADDR, 0xc8, 0x10),
+ 		   SNAND_MEMORG_1G_2K_64,
+diff --git a/build.sh b/build.sh
+index afcba6a2f..d775b6987 100755
+--- a/build.sh
++++ b/build.sh
+@@ -2,9 +2,9 @@
+ 
+ TOOLCHAIN=aarch64-linux-gnu-
+ #UBOOT_DIR=uboot-mtk-20220606
+-UBOOT_DIR=uboot-mtk-20230718-09eda825
++UBOOT_DIR="${UBOOT_DIR:-uboot-mtk-20250711}"
+ #ATF_DIR=atf-20220606-637ba581b
+-ATF_DIR=atf-20240117-bacca82a8
++ATF_DIR="${ATF_DIR:-atf-20250711}"
+ 
+ if [ -z "$SOC" ] || [ -z "$BOARD" ]; then
+ 	echo "Usage: SOC=[mt7981|mt7986] BOARD=<board name> MULTI_LAYOUT=[0|1] $0"
+diff --git a/uboot-mtk-20250711/arch/arm/dts/Makefile b/uboot-mtk-20250711/arch/arm/dts/Makefile
+index 3a1db5486..588c86903 100644
+--- a/uboot-mtk-20250711/arch/arm/dts/Makefile
++++ b/uboot-mtk-20250711/arch/arm/dts/Makefile
+@@ -1121,6 +1121,7 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += \
+ 	mt7623a-unielec-u7623-02-emmc.dtb \
+ 	mt7622-bananapi-bpi-r64.dtb \
+ 	mt7623n-bananapi-bpi-r2.dtb \
++	mt7981-ax3000t-an8855-512m.dtb \
+ 	mt7981-rfb.dtb \
+ 	mt7981-snfi-nand-rfb.dtb \
+ 	mt7981-spim-nand-rfb.dtb \
+diff --git a/uboot-mtk-20250711/arch/arm/dts/mt7981-ax3000t-an8855-512m.dts b/uboot-mtk-20250711/arch/arm/dts/mt7981-ax3000t-an8855-512m.dts
+new file mode 100644
+index 000000000..96b515dad
+--- /dev/null
++++ b/uboot-mtk-20250711/arch/arm/dts/mt7981-ax3000t-an8855-512m.dts
+@@ -0,0 +1,170 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/dts-v1/;
++#include "mt7981.dtsi"
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	#address-cells = <1>;
++	#size-cells = <1>;
++	model = "Xiaomi AX3000T AN8855 512M";
++	compatible = "xiaomi,ax3000t", "mediatek,mt7981";
++
++	chosen {
++		stdout-path = &uart0;
++		tick-timer = &timer0;
++	};
++
++	config {
++		bootcmd = "mtkboardboot";
++		blink_led = "yellow:system";
++		system_led = "blue:system";
++	};
++
++	mtd-layout {
++		layout@0 {
++			label = "default";
++			cmdline = "console=ttyS0,115200n1 loglevel=8 swiotlb=512 firmware=0 mtd=ubi uart_en=1";
++			mtdids = "nmbm0=nmbm0";
++			mtdparts = "nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),496m(ubi),256k(KF)";
++			boot_part = "ubi";
++			factory_part = "ubi";
++			sysupgrade_kernel_ubipart = "ubi";
++			sysupgrade_rootfs_ubipart = "ubi";
++		};
++
++		layout@1 {
++			label = "stock-128m";
++			cmdline = "console=ttyS0,115200n1 loglevel=8 swiotlb=512 firmware=0 mtd=ubi uart_en=1";
++			mtdids = "nmbm0=nmbm0";
++			mtdparts = "nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),34816k(ubi_kernel),79872k(ubi),256k(KF)";
++			boot_part = "ubi_kernel";
++			factory_part = "ubi_kernel";
++			sysupgrade_kernel_ubipart = "ubi_kernel";
++			sysupgrade_rootfs_ubipart = "ubi";
++		};
++
++		layout@2 {
++			label = "openwrt-112m";
++			mtdids = "nmbm0=nmbm0";
++			mtdparts = "nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),112m(ubi),256k(KF)";
++			boot_part = "ubi";
++			factory_part = "ubi";
++			sysupgrade_kernel_ubipart = "ubi";
++			sysupgrade_rootfs_ubipart = "ubi";
++		};
++
++		layout@3 {
++			label = "qwrt-112m";
++			mtdids = "nmbm0=nmbm0";
++			mtdparts = "nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),100m(ubi),12m(data),256k(KF)";
++			boot_part = "ubi";
++			factory_part = "ubi";
++			sysupgrade_kernel_ubipart = "ubi";
++			sysupgrade_rootfs_ubipart = "ubi";
++		};
++	};
++
++	gpio-keys {
++		compatible = "gpio-keys";
++
++		reset {
++			label = "reset";
++			linux,code = <KEY_RESTART>;
++			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
++		};
++
++		mesh {
++			label = "mesh";
++			linux,code = <BTN_9>;
++			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led-0 {
++			label = "blue:system";
++			gpios = <&pio 9 GPIO_ACTIVE_LOW>;
++		};
++
++		led-1 {
++			label = "yellow:system";
++			gpios = <&pio 10 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	memory@40000000 {
++		device_type = "memory";
++		reg = <0x40000000 0x20000000>;
++	};
++
++	bl2_verify {
++		bl2_compatible = "spim-nand";
++	};
++};
++
++&uart0 {
++	status = "okay";
++};
++
++&eth {
++	status = "okay";
++	mediatek,gmac-id = <0>;
++	phy-mode = "2500base-x";
++	mediatek,switch = "an8855";
++	reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
++
++	fixed-link {
++		speed = <2500>;
++		full-duplex;
++	};
++};
++
++&pio {
++	spi_flash_pins: spi0-pins-func-1 {
++		mux {
++			function = "flash";
++			groups = "spi0", "spi0_wp_hold";
++		};
++
++		conf-pu {
++			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
++			drive-strength = <MTK_DRIVE_8mA>;
++			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
++		};
++
++		conf-pd {
++			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
++			drive-strength = <MTK_DRIVE_8mA>;
++			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
++		};
++	};
++};
++
++&spi0 {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi_flash_pins>;
++	status = "okay";
++	must_tx;
++	enhance_timing;
++	dma_ext;
++	ipm_design;
++	support_quad;
++	tick_dly = <2>;
++	sample_sel = <0>;
++
++	spi_nand@0 {
++		compatible = "spi-nand";
++		reg = <0>;
++		spi-max-frequency = <52000000>;
++	};
++};
++
++&watchdog {
++	status = "disabled";
++};
+diff --git a/uboot-mtk-20250711/configs/mt7981_ax3000t_an8855_512m_defconfig b/uboot-mtk-20250711/configs/mt7981_ax3000t_an8855_512m_defconfig
+new file mode 100644
+index 000000000..5f0bbd4f0
+--- /dev/null
++++ b/uboot-mtk-20250711/configs/mt7981_ax3000t_an8855_512m_defconfig
+@@ -0,0 +1,105 @@
++CONFIG_ARM=y
++CONFIG_SYS_HAS_NONCACHED_MEMORY=y
++CONFIG_POSITION_INDEPENDENT=y
++CONFIG_ARCH_MEDIATEK=y
++CONFIG_TEXT_BASE=0x41e00000
++CONFIG_SYS_MALLOC_F_LEN=0x4000
++CONFIG_NR_DRAM_BANKS=1
++CONFIG_ENV_SIZE=0x10000
++CONFIG_ENV_OFFSET=0x0
++CONFIG_DEFAULT_DEVICE_TREE="mt7981-ax3000t-an8855-512m"
++CONFIG_SYS_PROMPT="AX3000T> "
++CONFIG_TARGET_MT7981=y
++CONFIG_DEBUG_UART_BASE=0x11002000
++CONFIG_DEBUG_UART_CLOCK=40000000
++CONFIG_SYS_LOAD_ADDR=0x46000000
++CONFIG_DEBUG_UART=y
++CONFIG_MEDIATEK_BOOTMENU=y
++CONFIG_MEDIATEK_BOOTMENU_DELAY=3
++CONFIG_MTK_WEB_FAILSAFE=y
++CONFIG_MTK_WEB_FAILSAFE_AFTER_BOOT_FAILURE=y
++CONFIG_MTK_UBI_SUPPORT=y
++CONFIG_MEDIATEK_MULTI_MTD_LAYOUT=y
++CONFIG_MTK_UPGRADE_BL2_VERIFY=y
++CONFIG_MTK_UPGRADE_FIP_VERIFY=y
++CONFIG_ENABLE_NAND_NMBM=y
++CONFIG_FIT=y
++CONFIG_AUTOBOOT_MENU_SHOW=y
++CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
++CONFIG_DEFAULT_FDT_FILE="mt7981-ax3000t-an8855-512m"
++CONFIG_LOGLEVEL=7
++CONFIG_LOG=y
++CONFIG_HUSH_PARSER=y
++CONFIG_SYS_CBSIZE=512
++CONFIG_SYS_PBSIZE=1049
++# CONFIG_BOOTM_NETBSD is not set
++# CONFIG_BOOTM_PLAN9 is not set
++# CONFIG_BOOTM_RTEMS is not set
++# CONFIG_BOOTM_VXWORKS is not set
++# CONFIG_CMD_ELF is not set
++# CONFIG_CMD_XIMG is not set
++# CONFIG_CMD_UNLZ4 is not set
++# CONFIG_CMD_UNZIP is not set
++# CONFIG_CMD_FLASH is not set
++CONFIG_CMD_MEMINFO=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_GPIO_READ=y
++CONFIG_CMD_PWM=y
++CONFIG_CMD_MTD=y
++CONFIG_CMD_NMBM=y
++CONFIG_CMD_TFTPPUT=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_SMC=y
++CONFIG_CMD_MTDPARTS=y
++CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
++CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),496m(ubi),256k(KF)"
++CONFIG_CMD_GL_BTN=y
++CONFIG_OF_EMBED=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_IS_IN_MTD=y
++CONFIG_ENV_MTD_DEV="Nvram"
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
++CONFIG_NETCONSOLE=y
++CONFIG_CONSOLE_MUX=y
++CONFIG_USE_IPADDR=y
++CONFIG_IPADDR="192.168.1.1"
++CONFIG_USE_NETMASK=y
++CONFIG_NETMASK="255.255.255.0"
++CONFIG_USE_SERVERIP=y
++CONFIG_SERVERIP="192.168.1.2"
++CONFIG_PROT_TCP=y
++CONFIG_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_BUTTON=y
++CONFIG_BUTTON_GPIO=y
++CONFIG_CLK=y
++# CONFIG_I2C is not set
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++# CONFIG_MMC is not set
++CONFIG_DM_MTD=y
++CONFIG_MTD_SPI_NAND=y
++CONFIG_PHY_FIXED=y
++CONFIG_MEDIATEK_ETH=y
++CONFIG_PINCTRL=y
++CONFIG_PINCONF=y
++CONFIG_PINCTRL_MT7981=y
++CONFIG_POWER_DOMAIN=y
++CONFIG_MTK_POWER_DOMAIN=y
++CONFIG_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_DM_REGULATOR_GPIO=y
++CONFIG_DM_PWM=y
++CONFIG_PWM_MTK=y
++CONFIG_DM_SERIAL=y
++CONFIG_MTK_SERIAL=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_MTK_SPIM=y
++CONFIG_TIMER=y
++CONFIG_MTK_TIMER=y
++CONFIG_HEXDUMP=y
++# CONFIG_EFI_LOADER is not set
+diff --git a/uboot-mtk-20250711/configs/mt7981_ax3000t_an8855_512m_multi_layout_defconfig b/uboot-mtk-20250711/configs/mt7981_ax3000t_an8855_512m_multi_layout_defconfig
+new file mode 100644
+index 000000000..5f0bbd4f0
+--- /dev/null
++++ b/uboot-mtk-20250711/configs/mt7981_ax3000t_an8855_512m_multi_layout_defconfig
+@@ -0,0 +1,105 @@
++CONFIG_ARM=y
++CONFIG_SYS_HAS_NONCACHED_MEMORY=y
++CONFIG_POSITION_INDEPENDENT=y
++CONFIG_ARCH_MEDIATEK=y
++CONFIG_TEXT_BASE=0x41e00000
++CONFIG_SYS_MALLOC_F_LEN=0x4000
++CONFIG_NR_DRAM_BANKS=1
++CONFIG_ENV_SIZE=0x10000
++CONFIG_ENV_OFFSET=0x0
++CONFIG_DEFAULT_DEVICE_TREE="mt7981-ax3000t-an8855-512m"
++CONFIG_SYS_PROMPT="AX3000T> "
++CONFIG_TARGET_MT7981=y
++CONFIG_DEBUG_UART_BASE=0x11002000
++CONFIG_DEBUG_UART_CLOCK=40000000
++CONFIG_SYS_LOAD_ADDR=0x46000000
++CONFIG_DEBUG_UART=y
++CONFIG_MEDIATEK_BOOTMENU=y
++CONFIG_MEDIATEK_BOOTMENU_DELAY=3
++CONFIG_MTK_WEB_FAILSAFE=y
++CONFIG_MTK_WEB_FAILSAFE_AFTER_BOOT_FAILURE=y
++CONFIG_MTK_UBI_SUPPORT=y
++CONFIG_MEDIATEK_MULTI_MTD_LAYOUT=y
++CONFIG_MTK_UPGRADE_BL2_VERIFY=y
++CONFIG_MTK_UPGRADE_FIP_VERIFY=y
++CONFIG_ENABLE_NAND_NMBM=y
++CONFIG_FIT=y
++CONFIG_AUTOBOOT_MENU_SHOW=y
++CONFIG_AUTOBOOT_MENU_MTK_SHOW=y
++CONFIG_DEFAULT_FDT_FILE="mt7981-ax3000t-an8855-512m"
++CONFIG_LOGLEVEL=7
++CONFIG_LOG=y
++CONFIG_HUSH_PARSER=y
++CONFIG_SYS_CBSIZE=512
++CONFIG_SYS_PBSIZE=1049
++# CONFIG_BOOTM_NETBSD is not set
++# CONFIG_BOOTM_PLAN9 is not set
++# CONFIG_BOOTM_RTEMS is not set
++# CONFIG_BOOTM_VXWORKS is not set
++# CONFIG_CMD_ELF is not set
++# CONFIG_CMD_XIMG is not set
++# CONFIG_CMD_UNLZ4 is not set
++# CONFIG_CMD_UNZIP is not set
++# CONFIG_CMD_FLASH is not set
++CONFIG_CMD_MEMINFO=y
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_GPIO_READ=y
++CONFIG_CMD_PWM=y
++CONFIG_CMD_MTD=y
++CONFIG_CMD_NMBM=y
++CONFIG_CMD_TFTPPUT=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_SMC=y
++CONFIG_CMD_MTDPARTS=y
++CONFIG_MTDIDS_DEFAULT="nmbm0=nmbm0"
++CONFIG_MTDPARTS_DEFAULT="nmbm0:1024k(bl2),256k(Nvram),256k(Bdata),2048k(factory),2048k(fip),256k(crash),256k(crash_log),496m(ubi),256k(KF)"
++CONFIG_CMD_GL_BTN=y
++CONFIG_OF_EMBED=y
++CONFIG_ENV_OVERWRITE=y
++CONFIG_ENV_IS_IN_MTD=y
++CONFIG_ENV_MTD_DEV="Nvram"
++CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG=y
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_NET_FORCE_IPADDR=y
++CONFIG_NETCONSOLE=y
++CONFIG_CONSOLE_MUX=y
++CONFIG_USE_IPADDR=y
++CONFIG_IPADDR="192.168.1.1"
++CONFIG_USE_NETMASK=y
++CONFIG_NETMASK="255.255.255.0"
++CONFIG_USE_SERVERIP=y
++CONFIG_SERVERIP="192.168.1.2"
++CONFIG_PROT_TCP=y
++CONFIG_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_BUTTON=y
++CONFIG_BUTTON_GPIO=y
++CONFIG_CLK=y
++# CONFIG_I2C is not set
++CONFIG_LED=y
++CONFIG_LED_BLINK=y
++CONFIG_LED_GPIO=y
++# CONFIG_MMC is not set
++CONFIG_DM_MTD=y
++CONFIG_MTD_SPI_NAND=y
++CONFIG_PHY_FIXED=y
++CONFIG_MEDIATEK_ETH=y
++CONFIG_PINCTRL=y
++CONFIG_PINCONF=y
++CONFIG_PINCTRL_MT7981=y
++CONFIG_POWER_DOMAIN=y
++CONFIG_MTK_POWER_DOMAIN=y
++CONFIG_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_DM_REGULATOR_GPIO=y
++CONFIG_DM_PWM=y
++CONFIG_PWM_MTK=y
++CONFIG_DM_SERIAL=y
++CONFIG_MTK_SERIAL=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_MTK_SPIM=y
++CONFIG_TIMER=y
++CONFIG_MTK_TIMER=y
++CONFIG_HEXDUMP=y
++# CONFIG_EFI_LOADER is not set
