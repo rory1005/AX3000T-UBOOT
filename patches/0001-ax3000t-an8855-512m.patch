@@ -103,7 +103,7 @@ index 000000000..96b515dad
 +	#address-cells = <1>;
 +	#size-cells = <1>;
 +	model = "Xiaomi AX3000T AN8855 512M";
-+	compatible = "xiaomi,ax3000t", "mediatek,mt7981";
++	compatible = "mediatek,mt7981", "mediatek,mt7981-rfb";
 +
 +	chosen {
 +		stdout-path = &uart0;
